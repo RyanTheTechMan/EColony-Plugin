@@ -8,17 +8,11 @@ import java.io.File;
 
 public class PluginConfig {
 
-	private Plugin plugin;
 	private File file;
 	private File folder;
 	private YamlConfiguration config;
-
-
 	public PluginConfig(Plugin plugin, String folder, String name) {
 		this.folder = new File(plugin.getDataFolder(), folder);
-		this.plugin = plugin;
-
-
 		try {
 			this.folder.mkdir();
 		} catch (Exception e) {
@@ -36,30 +30,21 @@ public class PluginConfig {
 	}
 
 	public PluginConfig(Plugin plugin, String name, boolean copy) {
-		this.plugin = plugin;
 		this.file = new File(plugin.getDataFolder(), name + ".yml");
-
 		if (copy) {
-
 			plugin.saveResource(file.getName(), true);
-
 		} else {
-
 			try {
 				file.createNewFile();
 			} catch (Exception e) {
-
 				e.printStackTrace();
-
 			}
-
 		}
 		reloadConfig();
 
 	}
 
 	public PluginConfig(Plugin plugin, String name) {
-		this.plugin = plugin;
 		this.file = new File(plugin.getDataFolder(), name + ".yml");
 			try {
 				file.createNewFile();
@@ -78,7 +63,6 @@ public class PluginConfig {
 	}
 
 	public void saveConfig() {
-
 		try {
 			config.save(file);
 		} catch (Exception e) {
