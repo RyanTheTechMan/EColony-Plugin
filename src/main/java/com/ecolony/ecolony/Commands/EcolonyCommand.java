@@ -79,7 +79,7 @@ public class EcolonyCommand implements CommandExecutor, TabExecutor {
                 if (m == null) {
                     sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid module name.");
                 } else {
-                    m.onCommand(sender, command, label, args);
+                    m.onCommand(sender, Arrays.copyOfRange(args, 2, args.length));
                 }
             }
         }
@@ -113,7 +113,7 @@ public class EcolonyCommand implements CommandExecutor, TabExecutor {
             if (args[0].equalsIgnoreCase("module")) {
                 final Module m = Main.instance.getModule(args[1]);
                 if (m != null) {
-                    return m.onTabComplete(sender, command, alias, args);
+                    return m.onTabComplete(sender, Arrays.copyOfRange(args, 2, args.length));
                 }
             }
         }

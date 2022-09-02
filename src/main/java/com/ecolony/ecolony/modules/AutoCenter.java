@@ -32,7 +32,7 @@ public class AutoCenter extends Utilities implements Module {
 
     @Override
     public void initConfig() {
-        config = new PluginConfig(Main.instance, "modules", id());
+        config = generateConfig();
         config.setDefault("Location", new Location(Main.instance.getServer().getWorlds().get(0), 0, 0, 0));
         config.setDefault("Speed", 1d);
         config.setDefault("Radius", 10d);
@@ -41,19 +41,19 @@ public class AutoCenter extends Utilities implements Module {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 4) {
-            if (args[2].equalsIgnoreCase("setting")) {
-                if (args[3].equalsIgnoreCase("speed")) {
+    public boolean onCommand(CommandSender sender, String[] args) {
+        if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("setting")) {
+                if (args[1].equalsIgnoreCase("speed")) {
                     sender.sendMessage(Main.prefix + name() + " speed is: " + config.getConfig().getDouble("Speed"));
                 }
-                else if (args[3].equalsIgnoreCase("radius")) {
+                else if (args[1].equalsIgnoreCase("radius")) {
                     sender.sendMessage(Main.prefix + name() + " radius is: " + config.getConfig().getDouble("Radius"));
                 }
-                else if (args[3].equalsIgnoreCase("startbelowheight")) {
+                else if (args[1].equalsIgnoreCase("startbelowheight")) {
                     sender.sendMessage(Main.prefix + name() + " start below height is: " + config.getConfig().getBoolean("StartBelowHeight"));
                 }
-                else if (args[3].equalsIgnoreCase("location")) {
+                else if (args[1].equalsIgnoreCase("location")) {
                     sender.sendMessage(Main.prefix + "Current location: " + getLocationString(config.getConfig().getLocation("Location")));
                 }
                 else {
@@ -62,32 +62,32 @@ public class AutoCenter extends Utilities implements Module {
             } else {
                 sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid argument!");
             }
-        } else if (args.length >= 5 && args.length <= 8) {
-            if (args[2].equalsIgnoreCase("setting")) {
-                if (args[3].equalsIgnoreCase("speed")) {
-                    if (args.length == 5) {
-                        config.getConfig().set("Speed", Double.parseDouble(args[4]));
+        } else if (args.length >= 3 && args.length <= 6) {
+            if (args[0].equalsIgnoreCase("setting")) {
+                if (args[1].equalsIgnoreCase("speed")) {
+                    if (args.length == 3) {
+                        config.getConfig().set("Speed", Double.parseDouble(args[2]));
                         config.saveConfig();
-                        sender.sendMessage(Main.prefix + "Speed set to " + args[4] + ".");
+                        sender.sendMessage(Main.prefix + "Speed set to " + args[2] + ".");
                         start();
                     } else {
                         sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid speed! Must be a number!");
                     }
                 }
-                else if (args[3].equalsIgnoreCase("radius")){
-                    if (args.length == 5){
-                        config.getConfig().set("Radius", Double.parseDouble(args[4]));
+                else if (args[1].equalsIgnoreCase("radius")){
+                    if (args.length == 3){
+                        config.getConfig().set("Radius", Double.parseDouble(args[2]));
                         config.saveConfig();
-                        sender.sendMessage(Main.prefix + "Radius set to " + args[4] + ".");
+                        sender.sendMessage(Main.prefix + "Radius set to " + args[2] + ".");
                         start();
                     } else {
                         sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid radius! Must be a number!");
                     }
                 }
-                else if (args[3].equalsIgnoreCase("startbelowheight")){
-                    if (args.length == 5){
-                        final boolean b = Boolean.parseBoolean(args[4]);
-                        config.getConfig().set("StartBelowHeight", Boolean.parseBoolean(args[4]));
+                else if (args[1].equalsIgnoreCase("startbelowheight")){
+                    if (args.length == 3){
+                        final boolean b = Boolean.parseBoolean(args[2]);
+                        config.getConfig().set("StartBelowHeight", Boolean.parseBoolean(args[2]));
                         config.saveConfig();
                         sender.sendMessage(Main.prefix + "StartBelowHeight set to " + (b ? (ChatColor.GREEN + "TRUE") : (ChatColor.RED + "FALSE")) + ChatColor.RESET + ".");
                         start();
@@ -95,9 +95,9 @@ public class AutoCenter extends Utilities implements Module {
                         sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid StartBelowHeight! Must be a boolean!");
                     }
                 }
-                else if (args[3].equalsIgnoreCase("location")) {
-                    if (args[4].equalsIgnoreCase("player")) {
-                        if (args.length == 5) {
+                else if (args[1].equalsIgnoreCase("location")) {
+                    if (args[2].equalsIgnoreCase("player")) {
+                        if (args.length == 3) {
                             if (sender instanceof Player p) {
                                 config.getConfig().set("Location", new Location(p.getWorld(), Math.floor(p.getLocation().getX()) + 0.5, Math.floor(p.getLocation().getY()) + 0.5, Math.floor(p.getLocation().getZ()) + 0.5));
                                 config.saveConfig();
@@ -106,8 +106,8 @@ public class AutoCenter extends Utilities implements Module {
                             } else {
                                 sender.sendMessage(Main.prefix + ChatColor.RED + "Error! You must be a player to use this command. You can enter world, x, y, z");
                             }
-                        } else if (args.length == 6) {
-                            Player p = Bukkit.getPlayer(args[5]);
+                        } else if (args.length == 4) {
+                            Player p = Bukkit.getPlayer(args[3]);
                             if (p == null) {
                                 sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Player not found.");
                             } else {
@@ -118,9 +118,9 @@ public class AutoCenter extends Utilities implements Module {
                             }
                         }
                     }
-                    else if (args.length == 7) {
+                    else if (args.length == 5) {
                         if (sender instanceof Player p) {
-                            Location loc = new Location(p.getWorld(), Double.parseDouble(args[4]), Double.parseDouble(args[5]), Double.parseDouble(args[6]));
+                            Location loc = new Location(p.getWorld(), Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
                             config.getConfig().set("Location", loc);
                             config.saveConfig();
                             sender.sendMessage(Main.prefix + name() + getLocationString(loc));
@@ -128,12 +128,12 @@ public class AutoCenter extends Utilities implements Module {
                         } else {
                             sender.sendMessage(Main.prefix + ChatColor.RED + "Error! You must be a player to use this command. You can enter world, x, y, z");
                         }
-                    } else if (args.length == 8) {
-                        World w = Main.instance.getServer().getWorld(args[4]);
+                    } else if (args.length == 6) {
+                        World w = Main.instance.getServer().getWorld(args[2]);
                         if (w == null) {
                             sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid world name.");
                         } else {
-                            Location loc = new Location(w, Double.parseDouble(args[5]), Double.parseDouble(args[6]), Double.parseDouble(args[7]));
+                            Location loc = new Location(w, Double.parseDouble(args[3]), Double.parseDouble(args[4]), Double.parseDouble(args[5]));
                             config.getConfig().set("Location", loc);
                             config.saveConfig();
                             sender.sendMessage(Main.prefix + name() + " location was set to " + getLocationString(loc));
@@ -153,24 +153,24 @@ public class AutoCenter extends Utilities implements Module {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 4) {
-            if (args[2].equalsIgnoreCase("setting")) {
+    public List<String> onTabComplete(CommandSender sender, String[] args) {
+        if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("setting")) {
                 return List.of("location", "speed", "radius", "startbelowheight");
             }
         }
-        else if (args[3].equalsIgnoreCase("location") && args.length <= 8 && sender instanceof Player p) {
+        else if (args[1].equalsIgnoreCase("location") && args.length <= 6 && sender instanceof Player p) {
             List<String> worldNames = new ArrayList<>();
             Main.instance.getServer().getWorlds().forEach(w -> worldNames.add(w.getName()));
-            if (args.length == 5) {
+            if (args.length == 3) {
                 ArrayList<String> arguments = new ArrayList<>();
                 arguments.add(String.valueOf(Math.floor(p.getLocation().getX()) + 0.5));
                 arguments.add("player");
                 arguments.addAll(worldNames);
                 return arguments;
-            } else if (args.length == 6) {
+            } else if (args.length == 4) {
                 ArrayList<String> arguments = new ArrayList<>();
-                if (args[4].equalsIgnoreCase("player")) {
+                if (args[2].equalsIgnoreCase("player")) {
                     Main.instance.getServer().getOnlinePlayers().forEach(pl -> {
                         if (pl.getName().equalsIgnoreCase(sender.getName())) {
                             arguments.add(0, pl.getName());
@@ -178,25 +178,25 @@ public class AutoCenter extends Utilities implements Module {
                             arguments.add(pl.getName());
                         }
                     });
-                } else if (worldNames.contains(args[4])) {
+                } else if (worldNames.contains(args[2])) {
                     arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getX()) + 0.5));
                 } else {
                     arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getY())));
                 }
                 return arguments;
-            } else if (args[4].equalsIgnoreCase("player")) {
+            } else if (args[2].equalsIgnoreCase("player")) {
                 return List.of();
-            } else if (args.length == 7) {
+            } else if (args.length == 5) {
                 ArrayList<String> arguments = new ArrayList<>();
-                if (worldNames.contains(args[4])) {
+                if (worldNames.contains(args[2])) {
                     arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getY())));
                 } else {
                     arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getZ()) + 0.5));
                 }
                 return arguments;
-            } else if (args.length == 8) {
+            } else if (args.length == 6) {
                 ArrayList<String> arguments = new ArrayList<>();
-                if (worldNames.contains(args[4])) {
+                if (worldNames.contains(args[2])) {
                     arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getZ()) + 0.5));
                 }
                 return arguments;

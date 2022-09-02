@@ -36,6 +36,10 @@ public interface Module {
         return id;
     }
 
-    boolean onCommand(CommandSender sender, Command command, String label, String[] args);
-    List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args);
+    boolean onCommand(CommandSender sender, String[] args);
+    List<String> onTabComplete(CommandSender sender, String[] args);
+
+    default PluginConfig generateConfig() {
+        return new PluginConfig(Main.instance, "modules", id());
+    }
 }
