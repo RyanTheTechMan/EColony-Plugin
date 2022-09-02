@@ -26,8 +26,6 @@ public class ItemGenerator extends Utilities {
     private int generatorFallTime;
     private String name;
 
-    public ItemGenerator() {}
-
     private int lastItemChosen = 0;
 
     public ItemGenerator(String id) {
@@ -42,8 +40,40 @@ public class ItemGenerator extends Utilities {
         return location;
     }
 
+    public void setLocation(Location location) {
+        this.location = location;
+        saveConfig();
+    }
+
+    public List<ItemStack> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemStack> items) {
+        this.items = items;
+        saveConfig();
+    }
+
+    public int getGeneratorFallTime() {
+        return generatorFallTime;
+    }
+
+    public void setGeneratorFallTime(int generatorFallTime) {
+        this.generatorFallTime = generatorFallTime;
+        saveConfig();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        saveConfig();
+    }
+
     public void readConfig() {
-        PluginConfig config = Main.instance.modules.get("Generator").config();
+        PluginConfig config = Main.instance.modules.get("generator").config();
         if (id == null || config.getConfig().get("Generator." + id) == null) {
             new Exception("ItemGenerator id is invalid").printStackTrace();
         }
@@ -56,7 +86,7 @@ public class ItemGenerator extends Utilities {
     }
 
     public void saveConfig() {
-        PluginConfig config = Main.instance.modules.get("Generator").config();
+        PluginConfig config = Main.instance.modules.get("generator").config();
         config.getConfig().set("Generators." + id + ".Location", location);
         config.getConfig().set("Generators." + id + ".FallTime", generatorFallTime);
         config.getConfig().set("Generators." + id + ".Items", items);
