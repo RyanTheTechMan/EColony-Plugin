@@ -229,7 +229,6 @@ public class AutoCenter extends Utilities implements Module {
                 });
             }
         };
-
     }
 
     @Override

@@ -7,4 +7,5 @@ public abstract class Utilities {
         return loc.getWorld().getName() + ", " + loc.getX() + ", " + loc.getY() + ", " + loc.getZ();
     }
     public float clamp(float val, float min, float max) {return Math.max(min, Math.min(max, val));}
+    public float clamp(double val, float min, float max) {return Math.max(min, Math.min(max, (float)val));}
 }

@@ -2,6 +2,7 @@ package com.ecolony.ecolony;
 
 import com.ecolony.ecolony.Commands.EcolonyCommand;
 import com.ecolony.ecolony.modules.AutoCenter;
+import com.ecolony.ecolony.modules.Generator;
 import com.ecolony.ecolony.modules.Module;
 import com.ecolony.ecolony.utilities.PluginConfig;
 import org.bukkit.Bukkit;
@@ -17,7 +18,6 @@ public final class Main extends JavaPlugin {
     public static Main instance;
     public BukkitScheduler scheduler;
     public PluginConfig config;
-
     public final HashMap<String, Module> modules = new HashMap<>();
 
     public static final String prefix = "" + ChatColor.BOLD + ChatColor.AQUA + "[" + ChatColor.DARK_PURPLE + "E-Colony" + ChatColor.AQUA + "]" + ChatColor.RESET + " ";
@@ -47,6 +47,7 @@ public final class Main extends JavaPlugin {
         config = new PluginConfig(this, "config");
 
         makeModuleConfig(new AutoCenter(), false);
+        makeModuleConfig(new Generator(), false);
 
         config.saveConfig();
     }
