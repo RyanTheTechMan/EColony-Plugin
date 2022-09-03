@@ -6,6 +6,7 @@ import com.ecolony.ecolony.utilities.Utilities;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Generator extends Utilities implements Module {
     }
 
     @Override
-    public String name() {return "Generator";}
+    public @NotNull String name() {return "Generator";}
 
     @Override
     public String description() {return "Spawns items at specified locations based on rarity.";}

@@ -1,5 +1,8 @@
 package com.ecolony.ecolony.modules;
 
+import com.ecolony.ecolony.Exceptions.InvalidSenderTypeException;
+import com.ecolony.ecolony.Exceptions.PlayerNotFoundException;
+import com.ecolony.ecolony.Exceptions.WorldNameException;
 import com.ecolony.ecolony.Main;
 import com.ecolony.ecolony.utilities.PluginConfig;
 import com.ecolony.ecolony.utilities.Utilities;
@@ -13,8 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -22,7 +27,7 @@ public class AutoCenter extends Utilities implements Module {
     private PluginConfig config;
 
     @Override
-    public String name() {return "AutoCenter";}
+    public @NotNull String name() {return "AutoCenter";}
 
     @Override
     public String description() {return "Automatically centers players to the specified location when falling.";}
@@ -75,7 +80,7 @@ public class AutoCenter extends Utilities implements Module {
                     }
                 }
                 else if (args[1].equalsIgnoreCase("radius")){
-                    if (args.length == 3){
+                    if (args.length == 3) {
                         config.getConfig().set("Radius", Double.parseDouble(args[2]));
                         config.saveConfig();
                         sender.sendMessage(Main.prefix + "Radius set to " + args[2] + ".");
@@ -85,7 +90,7 @@ public class AutoCenter extends Utilities implements Module {
                     }
                 }
                 else if (args[1].equalsIgnoreCase("startbelowheight")){
-                    if (args.length == 3){
+                    if (args.length == 3) {
                         final boolean b = Boolean.parseBoolean(args[2]);
                         config.getConfig().set("StartBelowHeight", Boolean.parseBoolean(args[2]));
                         config.saveConfig();
@@ -96,51 +101,15 @@ public class AutoCenter extends Utilities implements Module {
                     }
                 }
                 else if (args[1].equalsIgnoreCase("location")) {
-                    if (args[2].equalsIgnoreCase("player")) {
-                        if (args.length == 3) {
-                            if (sender instanceof Player p) {
-                                config.getConfig().set("Location", new Location(p.getWorld(), Math.floor(p.getLocation().getX()) + 0.5, Math.floor(p.getLocation().getY()) + 0.5, Math.floor(p.getLocation().getZ()) + 0.5));
-                                config.saveConfig();
-                                sender.sendMessage(Main.prefix + name() + " location was set to player location.");
-                                start();
-                            } else {
-                                sender.sendMessage(Main.prefix + ChatColor.RED + "Error! You must be a player to use this command. You can enter world, x, y, z");
-                            }
-                        } else if (args.length == 4) {
-                            Player p = Bukkit.getPlayer(args[3]);
-                            if (p == null) {
-                                sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Player not found.");
-                            } else {
-                                config.getConfig().set("Location", new Location(p.getWorld(), Math.floor(p.getLocation().getX()) + 0.5, Math.floor(p.getLocation().getY()) + 0.5, Math.floor(p.getLocation().getZ()) + 0.5));
-                                config.saveConfig();
-                                sender.sendMessage(Main.prefix + name() + " location was set to " + p.getName() + "'s  location.");
-                                start();
-                            }
-                        }
+                    Location loc = getLocationOnCommandReportError(sender, Arrays.copyOfRange(args, 2, args.length));
+                    if (loc != null) {
+                        config.getConfig().set("Location", loc);
+                        config.saveConfig();
+                        sender.sendMessage(Main.prefix + "Location set to " + getLocationString(loc) + ".");
+                        start();
                     }
-                    else if (args.length == 5) {
-                        if (sender instanceof Player p) {
-                            Location loc = new Location(p.getWorld(), Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
-                            config.getConfig().set("Location", loc);
-                            config.saveConfig();
-                            sender.sendMessage(Main.prefix + name() + getLocationString(loc));
-                            start();
-                        } else {
-                            sender.sendMessage(Main.prefix + ChatColor.RED + "Error! You must be a player to use this command. You can enter world, x, y, z");
-                        }
-                    } else if (args.length == 6) {
-                        World w = Main.instance.getServer().getWorld(args[2]);
-                        if (w == null) {
-                            sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid world name.");
-                        } else {
-                            Location loc = new Location(w, Double.parseDouble(args[3]), Double.parseDouble(args[4]), Double.parseDouble(args[5]));
-                            config.getConfig().set("Location", loc);
-                            config.saveConfig();
-                            sender.sendMessage(Main.prefix + name() + " location was set to " + getLocationString(loc));
-                            start();
-                        }
-                    } else {
-                        sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid argument!");
+                    else {
+                        sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid location!");
                     }
                 } else {
                     sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid argument!");
