@@ -1,4 +1,4 @@
-package com.ecolony.ecolony.modules;
+package com.ecolony.ecolony.modules.Generator;
 
 import com.ecolony.ecolony.Main;
 import com.ecolony.ecolony.utilities.Particles.Cube;
@@ -15,16 +15,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemGenerator extends Utilities {
 
     private BukkitTask task;
-    private String id;
+
+    private final String id;
     private Location location;
-    private List<ItemStack> items;
+    private List<ItemStack> items = new ArrayList<>();
     private int generatorFallTime;
     private String name;
+    private boolean enabled;
+    private int spawnTime;
 
     private int lastItemChosen = 0;
 
@@ -54,12 +58,21 @@ public class ItemGenerator extends Utilities {
         saveConfig();
     }
 
-    public int getGeneratorFallTime() {
+    public int getFallTime() {
         return generatorFallTime;
     }
 
-    public void setGeneratorFallTime(int generatorFallTime) {
+    public void setFallTime(int generatorFallTime) {
         this.generatorFallTime = generatorFallTime;
+        saveConfig();
+    }
+
+    public int getSpawnTime() {
+        return spawnTime;
+    }
+
+    public void setSpawnTime(int spawnTime) {
+        this.spawnTime = spawnTime;
         saveConfig();
     }
 
@@ -72,6 +85,13 @@ public class ItemGenerator extends Utilities {
         saveConfig();
     }
 
+    public boolean isEnabled(){return enabled;}
+
+    public void setEnabled(boolean enabled){
+        this.enabled = enabled;
+        saveConfig();
+    }
+
     public void readConfig() {
         PluginConfig config = Main.instance.modules.get("generator").config();
         if (id == null || config.getConfig().get("Generator." + id) == null) {
@@ -80,8 +100,11 @@ public class ItemGenerator extends Utilities {
         else {
             location = config.getConfig().getLocation("Generators." + id + ".Location");
             generatorFallTime = config.getConfig().getInt("Generators." + id + ".FallTime");
+            //noinspection unchecked
             items = (List<ItemStack>) config.getConfig().getList("Generators." + id + ".Items");
             name = config.getConfig().getString("Generators." + id + ".Name");
+            enabled = config.getConfig().getBoolean("Generators." + id + ".Enabled");
+            spawnTime = config.getConfig().getInt("Generators." + id + ".SpawnTime");
         }
     }
 
@@ -91,6 +114,8 @@ public class ItemGenerator extends Utilities {
         config.getConfig().set("Generators." + id + ".FallTime", generatorFallTime);
         config.getConfig().set("Generators." + id + ".Items", items);
         config.getConfig().set("Generators." + id + ".Name", name);
+        config.getConfig().set("Generators." + id + ".Enabled", enabled);
+        config.getConfig().set("Generators." + id + ".SpawnTime", spawnTime);
         config.saveConfig();
     }
 
@@ -103,22 +128,21 @@ public class ItemGenerator extends Utilities {
 
     public void start() {
         stop();
-        task = buildTask().runTaskTimer(Main.instance, 0, 20*30);
+        task = buildTask().runTaskTimer(Main.instance, 0, 20L * spawnTime);
     }
 
     private BukkitRunnable buildTask() {
         return new BukkitRunnable() {
             @Override
             public void run() {
-                spawnItem(location, new ItemStack(Material.values()[(int)(Math.random()*Material.values().length)]));
-//                if (items.isEmpty()) {
-//                    new Exception("ItemGenerator " + id + " has no items to generate").printStackTrace();
-//                }
-//                else {
-//                    lastItemChosen = lastItemChosen + (int) (Math.random() * items.size()) % items.size();
-//                    ItemStack item = items.get(lastItemChosen);
-//                    spawnItem(location, item);
-//                }
+                if (items.isEmpty()) {
+                    spawnItem(location, new ItemStack(getRandomItem()));
+                }
+                else {
+                    lastItemChosen = lastItemChosen + (int) (Math.random() * items.size()) % items.size();
+                    ItemStack item = items.get(lastItemChosen);
+                    spawnItem(location, item);
+                }
             }
         };
     }
@@ -137,7 +161,7 @@ public class ItemGenerator extends Utilities {
 
         final int taskSpeed = 1; // Higher = slower (ticks per update) TODO: Not working properly. Stay at 1 for now
 
-        BossBar bar = Bukkit.createBossBar("OMG IT'S A " + itemStack.displayName() + "!!!", BarColor.values()[(int)(Math.random()*BarColor.values().length)], BarStyle.values()[(int)(Math.random()*BarStyle.values().length)]);
+        BossBar bar = Bukkit.createBossBar("OMG IT'S A " + (itemStack.getItemMeta().displayName() == null ? itemStack.getType().name() : itemStack.getItemMeta().displayName()) + "!!!", BarColor.values()[(int)(Math.random()*BarColor.values().length)], BarStyle.values()[(int)(Math.random()*BarStyle.values().length)]);
 
         Main.instance.getServer().getOnlinePlayers().forEach(bar::addPlayer);
 
@@ -171,8 +195,8 @@ public class ItemGenerator extends Utilities {
                 else {
                     Cube.getParticles(e.getLocation(), 2, itemFallPercent*3000).forEach(loc -> e.getLocation().getWorld().spawnParticle(Particle.COMPOSTER, loc, 1, 0, 0,0, 10));
                 }
-
-                groundParticles.getParticles(lowest, Particle.REDSTONE, 5, 0.001).forEach(particleBuilder -> particleBuilder.allPlayers().color(Color.fromRGB(255-(int)(255*itemFallPercent), (int)(255*itemFallPercent), 0)).spawn());
+                double fallPercent = clamp(itemFallPercent, 0f, 1f);
+                groundParticles.getParticles(lowest, Particle.REDSTONE, 5, 0.001).forEach(particleBuilder -> particleBuilder.allPlayers().color(Color.fromRGB(255-(int)(255*fallPercent), (int)(255*fallPercent), 0)).spawn());
             }
         }.runTaskTimer(Main.instance, 0, taskSpeed);
 

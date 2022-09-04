@@ -1,10 +1,8 @@
-package com.ecolony.ecolony.modules;
+package com.ecolony.ecolony.utilities;
 
 import com.ecolony.ecolony.Main;
-import com.ecolony.ecolony.utilities.PluginConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -22,7 +20,6 @@ public interface Module {
      */
     boolean start();
     boolean stop();
-
 
     /**
      * @return This function must be overridden by the implementing class and return the class's config generated from {@link #generateConfig()}
@@ -62,8 +59,8 @@ public interface Module {
     }
 
     /**
-     * @param sender - the command sender
-     * @param args - the command arguments
+     * @param sender the command sender
+     * @param args the command arguments
      * @return true if the command was successful, false otherwise
      */
     boolean onCommand(CommandSender sender, String[] args);

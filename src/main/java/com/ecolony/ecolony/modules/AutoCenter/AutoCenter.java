@@ -1,22 +1,19 @@
-package com.ecolony.ecolony.modules;
+package com.ecolony.ecolony.modules.AutoCenter;
 
-import com.ecolony.ecolony.Exceptions.InvalidSenderTypeException;
-import com.ecolony.ecolony.Exceptions.PlayerNotFoundException;
-import com.ecolony.ecolony.Exceptions.WorldNameException;
 import com.ecolony.ecolony.Main;
+import com.ecolony.ecolony.utilities.Module;
 import com.ecolony.ecolony.utilities.PluginConfig;
 import com.ecolony.ecolony.utilities.Utilities;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +27,7 @@ public class AutoCenter extends Utilities implements Module {
     public @NotNull String name() {return "AutoCenter";}
 
     @Override
-    public String description() {return "Automatically centers players to the specified location when falling.";}
+    public @NotNull String description() {return "Automatically centers players to the specified location when falling.";}
 
     @Override
     public PluginConfig config() {return config;}
@@ -55,7 +52,7 @@ public class AutoCenter extends Utilities implements Module {
                 else if (args[1].equalsIgnoreCase("radius")) {
                     sender.sendMessage(Main.prefix + name() + " radius is: " + config.getConfig().getDouble("Radius"));
                 }
-                else if (args[1].equalsIgnoreCase("startbelowheight")) {
+                else if (args[1].equalsIgnoreCase("startBelowHeight")) {
                     sender.sendMessage(Main.prefix + name() + " start below height is: " + config.getConfig().getBoolean("StartBelowHeight"));
                 }
                 else if (args[1].equalsIgnoreCase("location")) {
@@ -89,7 +86,7 @@ public class AutoCenter extends Utilities implements Module {
                         sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid radius! Must be a number!");
                     }
                 }
-                else if (args[1].equalsIgnoreCase("startbelowheight")){
+                else if (args[1].equalsIgnoreCase("startBelowHeight")){
                     if (args.length == 3) {
                         final boolean b = Boolean.parseBoolean(args[2]);
                         config.getConfig().set("StartBelowHeight", Boolean.parseBoolean(args[2]));
@@ -123,53 +120,15 @@ public class AutoCenter extends Utilities implements Module {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return List.of("setting");
+        }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("setting")) {
-                return List.of("location", "speed", "radius", "startbelowheight");
+                return List.of("location", "speed", "radius", "startBelowHeight");
             }
-        }
-        else if (args[1].equalsIgnoreCase("location") && args.length <= 6 && sender instanceof Player p) {
-            List<String> worldNames = new ArrayList<>();
-            Main.instance.getServer().getWorlds().forEach(w -> worldNames.add(w.getName()));
-            if (args.length == 3) {
-                ArrayList<String> arguments = new ArrayList<>();
-                arguments.add(String.valueOf(Math.floor(p.getLocation().getX()) + 0.5));
-                arguments.add("player");
-                arguments.addAll(worldNames);
-                return arguments;
-            } else if (args.length == 4) {
-                ArrayList<String> arguments = new ArrayList<>();
-                if (args[2].equalsIgnoreCase("player")) {
-                    Main.instance.getServer().getOnlinePlayers().forEach(pl -> {
-                        if (pl.getName().equalsIgnoreCase(sender.getName())) {
-                            arguments.add(0, pl.getName());
-                        } else {
-                            arguments.add(pl.getName());
-                        }
-                    });
-                } else if (worldNames.contains(args[2])) {
-                    arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getX()) + 0.5));
-                } else {
-                    arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getY())));
-                }
-                return arguments;
-            } else if (args[2].equalsIgnoreCase("player")) {
-                return List.of();
-            } else if (args.length == 5) {
-                ArrayList<String> arguments = new ArrayList<>();
-                if (worldNames.contains(args[2])) {
-                    arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getY())));
-                } else {
-                    arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getZ()) + 0.5));
-                }
-                return arguments;
-            } else if (args.length == 6) {
-                ArrayList<String> arguments = new ArrayList<>();
-                if (worldNames.contains(args[2])) {
-                    arguments.add(String.valueOf(Math.floor(((Player) sender).getLocation().getZ()) + 0.5));
-                }
-                return arguments;
-            }
+        } else if (args[1].equalsIgnoreCase("location") && args.length <= 6) {
+            return getLocationTabComplete(sender, Arrays.copyOfRange(args, 2, args.length)); //TODO: possibly fix range
         }
         return List.of();
     }
@@ -178,12 +137,15 @@ public class AutoCenter extends Utilities implements Module {
     public AutoCenter() {
         initModule();
     }
-
+    @Nullable
     private BukkitRunnable buildTask() {
         final Location centerPosition = config.getConfig().getLocation("Location"); //TODO: Make this send an error if the location is invalid
         final float speed = (float)config.getConfig().getDouble("Speed");
         final double radius = config.getConfig().getDouble("Radius");
         final boolean startBelowHeight = config.getConfig().getBoolean("StartBelowHeight");
+        if (centerPosition == null){
+            return null;
+        }
         return new BukkitRunnable() {
             @Override
             public void run() {
@@ -204,7 +166,10 @@ public class AutoCenter extends Utilities implements Module {
     public boolean start() {
         if (task != null && !task.isCancelled()) task.cancel();
         final BukkitRunnable runnable = buildTask();
-
+        if (runnable == null){
+            Bukkit.getLogger().log(Level.WARNING, "[Ecolony] Module " + name() + " cannot start because location was invalid.");
+            return false;
+        }
         task = runnable.runTaskTimer(Main.instance, 0, 1);
 
         Bukkit.getLogger().log(Level.INFO, "[Ecolony] Module started: " + name());

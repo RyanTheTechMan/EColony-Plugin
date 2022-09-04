@@ -1,17 +1,16 @@
 package com.ecolony.ecolony;
 
 import com.ecolony.ecolony.Commands.EcolonyCommand;
-import com.ecolony.ecolony.modules.AutoCenter;
-import com.ecolony.ecolony.modules.Generator;
-import com.ecolony.ecolony.modules.Module;
+import com.ecolony.ecolony.modules.AutoCenter.AutoCenter;
+import com.ecolony.ecolony.modules.Generator.Generator;
+import com.ecolony.ecolony.modules.Mine.Mine;
+import com.ecolony.ecolony.utilities.Module;
 import com.ecolony.ecolony.utilities.PluginConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 
 public final class Main extends JavaPlugin {
@@ -36,9 +35,7 @@ public final class Main extends JavaPlugin {
         config.setDefault("Modules." + module.id(), defaultOn);
     }
 
-    public Module getModule(String moduleID) {
-        return modules.get(moduleID);
-    }
+    public Module getModule(String moduleID) {return modules.get(moduleID);}
     private void addCommands() {
         getCommand("ecolony").setExecutor(new EcolonyCommand());
         getCommand("ecolony").setTabCompleter(new EcolonyCommand());
@@ -48,6 +45,7 @@ public final class Main extends JavaPlugin {
 
         makeModuleConfig(new AutoCenter(), false);
         makeModuleConfig(new Generator(), false);
+        makeModuleConfig(new Mine(), false);
 
         config.saveConfig();
     }
