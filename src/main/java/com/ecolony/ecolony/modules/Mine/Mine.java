@@ -6,13 +6,18 @@ import com.ecolony.ecolony.utilities.PluginConfig;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Mine implements Module {
+public class Mine implements Module, Listener {
     private PluginConfig config;
 
     @Override
@@ -22,14 +27,14 @@ public class Mine implements Module {
 
     public Mine() {initModule();}
 
+    private final ArrayList<Player> inSetupMode = new ArrayList<>();
+
     @Override
     public @NotNull String description() {
         return "Spawns blocks at specified locations.";
     }
-    private BukkitTask task;
     @Override
     public boolean start() {
-        if (task != null && !task.isCancelled()) task.cancel();
         final BukkitRunnable runnable = buildTask();
 
         task = runnable.runTaskTimer(Main.instance, 0, 60);
@@ -39,6 +44,7 @@ public class Mine implements Module {
     @Override
     public boolean stop() {
         if (task != null && !task.isCancelled()) task.cancel();
+
         return true;
     }
 
@@ -71,5 +77,22 @@ public class Mine implements Module {
                 loc.getBlock().setType(Material.AMETHYST_BLOCK);
             }
         };
+    }
+
+    public void onBlockBreak(BlockBreakEvent event) {
+
+    }
+
+    public void onCommandEvent(PlayerCommandPreprocessEvent event) {
+        if (event.getMessage().equalsIgnoreCase("/cancel") && inSetupMode.contains(event.getPlayer())) {
+            event.setCancelled(true);
+            if (isEnabled()) {
+                stop();
+                event.getPlayer().sendMessage("Mine module disabled.");
+            } else {
+                start();
+                event.getPlayer().sendMessage("Mine module enabled.");
+            }
+        }
     }
 }
