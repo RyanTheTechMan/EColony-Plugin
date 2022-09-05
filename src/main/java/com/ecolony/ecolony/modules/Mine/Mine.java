@@ -36,14 +36,11 @@ public class Mine implements Module, Listener {
     @Override
     public boolean start() {
         final BukkitRunnable runnable = buildTask();
-
-        task = runnable.runTaskTimer(Main.instance, 0, 60);
         return true;
     }
 
     @Override
     public boolean stop() {
-        if (task != null && !task.isCancelled()) task.cancel();
 
         return true;
     }
