@@ -94,14 +94,14 @@ public class ItemGenerator extends Utilities {
 
     public void readConfig() {
         PluginConfig config = Main.instance.modules.get("generator").config();
-        if (id == null || config.getConfig().get("Generator." + id) == null) {
+        if (id == null || config.getConfig().get("Generators") == null) {
             new Exception("ItemGenerator id is invalid").printStackTrace();
         }
         else {
             location = config.getConfig().getLocation("Generators." + id + ".Location");
             generatorFallTime = config.getConfig().getInt("Generators." + id + ".FallTime");
             //noinspection unchecked
-            items = (List<ItemStack>) config.getConfig().getList("Generators." + id + ".Items");
+            items = (List<ItemStack>) config.getConfig().getList("Generators." + id + ".Items", new ArrayList<>());
             name = config.getConfig().getString("Generators." + id + ".Name");
             enabled = config.getConfig().getBoolean("Generators." + id + ".Enabled");
             spawnTime = config.getConfig().getInt("Generators." + id + ".SpawnTime");
@@ -128,7 +128,9 @@ public class ItemGenerator extends Utilities {
 
     public void start() {
         stop();
-        task = buildTask().runTaskTimer(Main.instance, 0, 20L * spawnTime);
+        if (isEnabled() && Main.instance.getModule("generator").isEnabled()){
+            task = buildTask().runTaskTimer(Main.instance, 0, 20L * spawnTime);
+        }
     }
 
     private BukkitRunnable buildTask() {

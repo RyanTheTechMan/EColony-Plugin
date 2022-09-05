@@ -21,7 +21,9 @@ public class Generator extends Utilities implements Module {
     private PluginConfig config;
     private List<ItemGenerator> generators;
 
-    public Generator() {initModule();}
+    public Generator() {
+        initModule();
+    }
 
     @Override
     public @NotNull String name() {return "Generator";}
@@ -31,7 +33,11 @@ public class Generator extends Utilities implements Module {
 
     @Override
     public boolean start() {
-        generators = getAllItemGenerators();
+        Main.instance.getLogger().log(Level.WARNING, "HEY!!!!!!!!!!! Called Start");
+        Main.instance.getLogger().log(Level.WARNING, "HEY!!!!!!!!!!! Found " + generators.size() + " generators.");
+        for (ItemGenerator generator : generators) {
+            generator.start();
+        }
         return true;
     }
 
@@ -50,14 +56,15 @@ public class Generator extends Utilities implements Module {
     public void initConfig() {
         config = generateConfig();
         config.saveConfig();
+        generators = getAllItemGenerators();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(Main.prefix + ChatColor.RED + "Invalid syntax.");
             return true;
         }
+        if (args[0].equalsIgnoreCase("enable")||args[0].equalsIgnoreCase("disable"))return true;
         if (args[0].equalsIgnoreCase("create")) {
             if (args.length != 2) {
                 sender.sendMessage(Main.prefix + ChatColor.RED + "Invalid syntax.");
@@ -104,13 +111,13 @@ public class Generator extends Utilities implements Module {
                     sender.sendMessage(Main.prefix + ChatColor.RED + "WARNING! Generator items are not set. Using random items.");
                 }
                 if (okayToRun) {
-                    selectedGenerator.start();
                     selectedGenerator.setEnabled(true);
+                    selectedGenerator.start();
                     sender.sendMessage(Main.prefix + "Generator " + selectedGenerator.getName() + " has been enabled.");
                 }
             } else if (args[1].equalsIgnoreCase("disable")) {
-                selectedGenerator.stop();
                 selectedGenerator.setEnabled(false);
+                selectedGenerator.stop();
                 sender.sendMessage(Main.prefix + "Generator " + selectedGenerator.getName() + " has stopped.");
             } else if (args[1].equalsIgnoreCase("remove")) {
                 selectedGenerator.stop();
@@ -246,12 +253,12 @@ public class Generator extends Utilities implements Module {
 
     private List<ItemGenerator> getAllItemGenerators() {
         List<ItemGenerator> list = new ArrayList<>();
-        ConfigurationSection configurationSection = config.getConfig().getConfigurationSection("Generators.id");
+        ConfigurationSection configurationSection = config.getConfig().getConfigurationSection("Generators");
         if (configurationSection == null) {
+            Main.instance.getLogger().log(Level.WARNING,"There are no IDs");
             return list;
         }
         String[] ids = configurationSection.getKeys(false).toArray(new String[0]);
-        Main.instance.getLogger().log(Level.WARNING,"TEST_MESSAGE PLEASE REMOVE " + Arrays.toString(ids));
         for (String id : ids) {
             ItemGenerator gen = new ItemGenerator(id);
             gen.readConfig();

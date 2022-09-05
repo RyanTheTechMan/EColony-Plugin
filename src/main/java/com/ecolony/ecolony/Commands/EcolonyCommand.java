@@ -26,24 +26,28 @@ public class EcolonyCommand implements CommandExecutor, TabExecutor {
             }
             out.delete(out.length() - 2, out.length() - 1);
             sender.sendMessage(Main.prefix + "Modules:\n" + out);
-        } else if (args.length == 2) {
+        }
+
+        Module m = null;
+        if (args.length >= 2) {
             if (args[0].equalsIgnoreCase("module")) {
-                final Module m = Main.instance.getModule(args[1]);
-                if (Main.instance.getModule(args[1]) == null) {
+                m = Main.instance.getModule(args[1]);
+                if (m == null) {
                     sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid module name.");
-                } else {
+                }
+            }
+        }
+
+        if (m != null) {
+            if (args.length == 2) {
+                if (args[0].equalsIgnoreCase("module")) {
                     sender.sendMessage(Main.prefix + "Module info:\n" +
                             ChatColor.BOLD + "Name: " + ChatColor.RESET + m.name() + "\n" +
                             ChatColor.BOLD + "Enabled: " + ChatColor.RESET + (m.isEnabled() ? ChatColor.GREEN + "Yes" : ChatColor.RED + "No") + ChatColor.RESET + "\n" +
                             ChatColor.BOLD + "Description: " + ChatColor.RESET + Main.instance.getModule(args[1]).description());
                 }
-            }
-        } else if (args.length == 3) {
-            if (args[0].equalsIgnoreCase("module")) {
-                Module m = Main.instance.getModule(args[1]);
-                if (m == null) {
-                    sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid module name.");
-                } else {
+            } else if (args.length == 3) {
+                if (args[0].equalsIgnoreCase("module")) {
                     if (args[2].equalsIgnoreCase("enable")) {
                         Main.instance.config.getConfig().set("Modules." + m.id(), true);
                         Main.instance.config.saveConfig();
@@ -54,19 +58,13 @@ public class EcolonyCommand implements CommandExecutor, TabExecutor {
                         Main.instance.config.saveConfig();
                         m.stop();
                         sender.sendMessage(Main.prefix + ChatColor.DARK_RED + "Module " + m.name() + " disabled.");
-                    } else {
-                        sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid option!");
                     }
+                } else {
+                    sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid argument!");
                 }
-            } else {
-                sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid argument!");
             }
-        }
-        if (args[0].equalsIgnoreCase("module")) {
-            Module m = Main.instance.getModule(args[1]);
-            if (m == null) {
-                sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Invalid module name.");
-            } else {
+
+            if (args[0].equalsIgnoreCase("module")) {
                 m.onCommand(sender, Arrays.copyOfRange(args, 2, args.length));
             }
         }
