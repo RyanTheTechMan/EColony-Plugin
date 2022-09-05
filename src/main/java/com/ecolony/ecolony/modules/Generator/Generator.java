@@ -64,7 +64,7 @@ public class Generator extends Utilities implements Module {
         if (args.length == 0) {
             return true;
         }
-        if (args[0].equalsIgnoreCase("enable")||args[0].equalsIgnoreCase("disable"))return true;
+        if (args[0].equalsIgnoreCase("enable")||args[0].equalsIgnoreCase("disable")) return true;
         if (args[0].equalsIgnoreCase("create")) {
             if (args.length != 2) {
                 sender.sendMessage(Main.prefix + ChatColor.RED + "Invalid syntax.");
@@ -82,7 +82,15 @@ public class Generator extends Utilities implements Module {
             sender.sendMessage(Main.prefix + ChatColor.RED + "Invalid generator.");
             return true;
         }
-        if (args.length == 2) {
+        if (args.length == 1) {
+            sender.sendMessage(Main.prefix + ChatColor.BOLD + "Generator Information:" + ChatColor.RESET + "\n" +
+                    ChatColor.BOLD + "Name: " + ChatColor.RESET + selectedGenerator.getName() + "\n" +
+                    ChatColor.BOLD + "ID: " + ChatColor.RESET + selectedGenerator.getId() + "\n" +
+                    ChatColor.BOLD + "Enabled: " + ChatColor.RESET + selectedGenerator.isEnabled() + "\n" +
+                    ChatColor.BOLD + "Location: " + ChatColor.RESET + selectedGenerator.getLocation().toString() + "\n" +
+                    ChatColor.BOLD + "Items: " + ChatColor.RESET + Arrays.toString(selectedGenerator.getItems().toArray()));
+        }
+        else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("location")) {
                 sender.sendMessage(Main.prefix + "Generator " + selectedGenerator.getName() + " location is " + getLocationString(selectedGenerator.getLocation()) + ".");
             }
@@ -225,8 +233,7 @@ public class Generator extends Utilities implements Module {
     @Override
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            List<String> arguments = new ArrayList<>();
-            arguments.add("create");
+            List<String> arguments = new ArrayList<>(List.of("create", "remove"));
             if (args[0].toLowerCase().startsWith("id:")) {
                 arguments.addAll(generators.stream().filter(g -> g.getId().startsWith(args[0].toLowerCase().replace("id:", ""))).map(g -> "id:" + g.getId()).toList());
             }
