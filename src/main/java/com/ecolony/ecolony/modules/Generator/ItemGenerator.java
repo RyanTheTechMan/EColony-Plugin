@@ -32,53 +32,39 @@ public class ItemGenerator extends Utilities {
 
     private int lastItemChosen = 0;
 
-    public ItemGenerator(String id) {
-        this.id = id;
-    }
+    public ItemGenerator(String id) {this.id = id;}
 
-    public String getId() {
-        return id;
-    }
+    public String getId() {return id;}
 
-    public Location getLocation() {
-        return location;
-    }
+    public Location getLocation() {return location;}
 
     public void setLocation(Location location) {
         this.location = location;
         saveConfig();
     }
 
-    public List<ItemStack> getItems() {
-        return items;
-    }
+    public List<ItemStack> getItems() {return items;}
 
     public void setItems(List<ItemStack> items) {
         this.items = items;
         saveConfig();
     }
 
-    public int getFallTime() {
-        return generatorFallTime;
-    }
+    public int getFallTime() {return generatorFallTime;}
 
     public void setFallTime(int generatorFallTime) {
         this.generatorFallTime = generatorFallTime;
         saveConfig();
     }
 
-    public int getSpawnTime() {
-        return spawnTime;
-    }
+    public int getSpawnTime() {return spawnTime;}
 
     public void setSpawnTime(int spawnTime) {
         this.spawnTime = spawnTime;
         saveConfig();
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() {return name;}
 
     public void setName(String name) {
         this.name = name;
@@ -120,15 +106,12 @@ public class ItemGenerator extends Utilities {
     }
 
     public void stop() {
-        if (task != null) {
-            task.cancel();
-            task = null;
-        }
+        if (task != null && !task.isCancelled()) task.cancel();
     }
 
     public void start() {
         stop();
-        if (isEnabled() && Main.instance.getModule("generator").isEnabled()){
+        if (enabled && Main.instance.getModule("generator").isEnabled()){
             task = buildTask().runTaskTimer(Main.instance, 0, 20L * spawnTime);
         }
     }
@@ -156,9 +139,7 @@ public class ItemGenerator extends Utilities {
         e.setCanPlayerPickup(false);
 
         final Location lowest = location.clone();
-        while(!lowest.getBlock().getType().isSolid() && lowest.getY() >= -64) {
-            lowest.subtract(0, 1, 0);
-        }
+        while(!lowest.getBlock().getType().isSolid() && lowest.getY() >= -64) lowest.subtract(0, 1, 0);
         lowest.add(0,1,0);
 
         final int taskSpeed = 1; // Higher = slower (ticks per update) TODO: Not working properly. Stay at 1 for now
