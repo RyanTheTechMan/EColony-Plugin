@@ -166,10 +166,11 @@ public abstract class Utilities {
     }
 
     public Material getRandomItem() { //TODO: add javadoc
-        Material mat = null;
-        while (mat == null || !mat.isItem()) {
+        Material mat;
+        do {
             mat = Material.values()[new Random().nextInt(Material.values().length)];
         }
+        while(!mat.isItem());
         return mat;
     }
 }
