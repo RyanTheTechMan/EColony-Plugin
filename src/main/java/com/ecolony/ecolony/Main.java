@@ -4,6 +4,7 @@ import com.ecolony.ecolony.Commands.EcolonyCommand;
 import com.ecolony.ecolony.modules.AutoCenter.AutoCenter;
 import com.ecolony.ecolony.modules.Generator.Generator;
 import com.ecolony.ecolony.modules.Mine.Mine;
+import com.ecolony.ecolony.utilities.Language;
 import com.ecolony.ecolony.utilities.Module;
 import com.ecolony.ecolony.utilities.PluginConfig;
 import org.bukkit.Bukkit;
@@ -18,14 +19,23 @@ public final class Main extends JavaPlugin {
     public BukkitScheduler scheduler;
     public PluginConfig config;
     public final HashMap<String, Module> modules = new HashMap<>();
+    public Language language;
 
     public static final String prefix = "" + ChatColor.BOLD + ChatColor.AQUA + "[" + ChatColor.DARK_PURPLE + "E-Colony" + ChatColor.AQUA + "]" + ChatColor.RESET + " ";
     @Override
     public void onEnable() {
         Main.instance = this;
+        language = new Language();
         scheduler = Bukkit.getServer().getScheduler();
+        initConfig();
         setupModules();
         addCommands();
+    }
+
+    private void initConfig() {
+        config = new PluginConfig(this, "config");
+        config.setDefault("Lang", "en_us");
+        config.saveConfig();
     }
 
     @Override
@@ -41,8 +51,6 @@ public final class Main extends JavaPlugin {
         getCommand("ecolony").setTabCompleter(new EcolonyCommand());
     }
     private void setupModules() {
-        config = new PluginConfig(this, "config");
-
         makeModuleConfig(new AutoCenter(), false);
         makeModuleConfig(new Generator(), false);
         makeModuleConfig(new Mine(), false);
