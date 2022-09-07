@@ -4,6 +4,7 @@ import com.ecolony.ecolony.Commands.EcolonyCommand;
 import com.ecolony.ecolony.modules.AutoCenter.AutoCenter;
 import com.ecolony.ecolony.modules.Generator.Generator;
 import com.ecolony.ecolony.modules.Mine.Mine;
+import com.ecolony.ecolony.utilities.ItemRarityGUI.ItemRarityGUI;
 import com.ecolony.ecolony.utilities.Module;
 import com.ecolony.ecolony.utilities.PluginConfig;
 import org.bukkit.Bukkit;
@@ -26,6 +27,12 @@ public final class Main extends JavaPlugin {
         scheduler = Bukkit.getServer().getScheduler();
         setupModules();
         addCommands();
+        addListeners();
+    }
+
+    private void addListeners() {
+        getServer().getPluginManager().registerEvents(new Mine(), this);
+        getServer().getPluginManager().registerEvents(new ItemRarityGUI(), this);
     }
 
     @Override

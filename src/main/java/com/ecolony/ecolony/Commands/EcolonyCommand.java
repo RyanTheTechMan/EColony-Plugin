@@ -1,12 +1,17 @@
 package com.ecolony.ecolony.Commands;
 
 import com.ecolony.ecolony.Main;
+import com.ecolony.ecolony.utilities.ItemRarityGUI.Item;
+import com.ecolony.ecolony.utilities.ItemRarityGUI.ItemRarityGUI;
 import com.ecolony.ecolony.utilities.Module;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +25,21 @@ public class EcolonyCommand implements CommandExecutor, TabExecutor {
         if (args.length == 0) {
             sender.sendMessage(Main.prefix + ChatColor.RED + "Error! Incomplete command.");
         } else if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("test")) { //TODO: Remove this
+                sender.sendMessage("Testing GUI");
+                List<Item> items = new ArrayList<>();
+                items.add(new Item(new ItemStack(Material.ACACIA_TRAPDOOR), 12));
+                items.add(new Item(new ItemStack(Material.DIAMOND), 2));
+                items.add(new Item(new ItemStack(Material.NETHER_BRICK), 4));
+                items.add(new Item(new ItemStack(Material.BLACK_CONCRETE), 2));
+                items.add(new Item(new ItemStack(Material.DEAD_BUSH), 8));
+                items.add(new Item(new ItemStack(Material.BLACK_CANDLE), 2));
+                items.add(new Item(new ItemStack(Material.FLINT), 8));
+
+                ItemRarityGUI gui = new ItemRarityGUI(items);
+                gui.display((Player) sender);
+                return true;
+            }
             StringBuilder out = new StringBuilder();
             for (Module m : Main.instance.modules.values()) {
                 out.append(" - ").append(ChatColor.RESET).append(m.isEnabled() ? ChatColor.GREEN : ChatColor.RED).append(m.name()).append(ChatColor.RESET).append("\n");
@@ -74,7 +94,7 @@ public class EcolonyCommand implements CommandExecutor, TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return List.of("module");
+            return List.of("module", "test"); //TODO: Remove test
         } else if (args.length == 2) {
             return Main.instance.modules.keySet().stream().filter(s -> s.toLowerCase().startsWith(args[1])).collect(Collectors.toList());
         } else if (args.length >= 3) {
