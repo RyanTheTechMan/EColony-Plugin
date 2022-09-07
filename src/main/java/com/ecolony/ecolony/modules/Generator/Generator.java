@@ -87,7 +87,7 @@ public class Generator extends Utilities implements Module {
                     ChatColor.BOLD + "Name: " + ChatColor.RESET + selectedGenerator.getName() + "\n" +
                     ChatColor.BOLD + "ID: " + ChatColor.RESET + selectedGenerator.getId() + "\n" +
                     ChatColor.BOLD + "Enabled: " + ChatColor.RESET + selectedGenerator.isEnabled() + "\n" +
-                    ChatColor.BOLD + "Location: " + ChatColor.RESET + selectedGenerator.getLocation().toString() + "\n" +
+                    ChatColor.BOLD + "Location: " + ChatColor.RESET + getLocationString(selectedGenerator.getLocation()) + "\n" +
                     ChatColor.BOLD + "Items: " + ChatColor.RESET + Arrays.toString(selectedGenerator.getItems().toArray()));
         }
         else if (args.length == 2) {
