@@ -233,7 +233,7 @@ public class Generator extends Utilities implements Module {
     @Override
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            List<String> arguments = new ArrayList<>(List.of("create", "remove"));
+            List<String> arguments = new ArrayList<>(List.of("create"));
             if (args[0].toLowerCase().startsWith("id:")) {
                 arguments.addAll(generators.stream().filter(g -> g.getId().startsWith(args[0].toLowerCase().replace("id:", ""))).map(g -> "id:" + g.getId()).toList());
             }
@@ -249,7 +249,7 @@ public class Generator extends Utilities implements Module {
             } else {
                 arguments.add("enable");
             }
-            arguments.addAll(Arrays.asList("location", "fallTime", "spawnTime", "name"));
+            arguments.addAll(Arrays.asList("location", "fallTime", "spawnTime", "name", "remove"));
             return arguments;
         }
         else if (args[1].equalsIgnoreCase("location")) {
